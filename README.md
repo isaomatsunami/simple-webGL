@@ -1,2 +1,2 @@
 # webGL
-simple wrapper of webGL functions
+This project is about simple object-oriented wrapper of webGL functions.
