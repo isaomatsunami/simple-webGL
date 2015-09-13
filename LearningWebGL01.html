@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="js/gl-matrix-min.js"></script>
+<script src="js/webgl.js"></script>
+<style>
+  body {width: 1000px;}
+</style>
+<body>
+<div id="chart"></div>
+<p>Run python -m SimpleHTTPServer or python3 -m http.server and access to localhost:8000</p>
+</body>
+<script id="shader-fs" type="x-shader/x-fragment">
+precision mediump float;
+void main(void) {
+  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+</script>
+<script id="shader-vs" type="x-shader/x-vertex">
+attribute vec3 aVertexPosition;
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+void main(void) {
+  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+}
+</script><script>
+$(document).ready(function() {
+  var width = 1000, height = 700, nearFrustum = 0.1, farFrustum = 100;
+  
+  // this constructor is equivalent to initGL in LearningWebGL lessons.
+  // gl is, in itself, WebGLRenderingContext. but many function are add.
+  var gl = gl_Context( document.getElementById("chart"), width, height);
+  if( gl.failed ) {
+    console.log("Could not initialise WebGL, sorry :-(");
+    return;
+  };
+
+  // this constructor is equivalent to getShader/initShaders in LearningWebGL lessons.
+  // automatically calls getAttribLocation/getUniformLocation in shader description
+  var shaderProgram = new gl.GlslProg("shader-vs", "shader-fs");
+  // perspective matrix
+  var pMatrix = mat4.create();
+
+  // initBuffers() part in Lesson 1
+  // this part is constructing geometry
+  triangleGeometry = function(){
+    var vertices = [
+      0.0,  1.0,  0.0,
+      -1.0, -1.0,  0.0,
+      1.0, -1.0,  0.0
+    ];
+    this.vertices = new Float32Array( vertices );
+    // object knows how to draw itself.
+    this.mode = GL_TRIANGLES;
+    this.draw = function( vertexBuffer ){
+        vertexBuffer.drawArrays( this.mode );
+    };
+  }
+  var triangle = new triangleGeometry();
+  var triangleVertexBuffer = new gl.Buffer( triangle.vertices, 3, triangle.vertices.length / 3);
+  var triangleMV = new mvMatrix(); // mvMatrix contains position and quat(rotaion)
+  /*  above lines are equivalent to below,  
+  var triangleVertexPositionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+  triangleVertexPositionBuffer.itemSize = 3;
+  triangleVertexPositionBuffer.numItems = 3;
+  */
+  squareGeometry = function(){
+    var vertices = [
+       1.0,  1.0,  0.0,
+      -1.0,  1.0,  0.0,
+       1.0, -1.0,  0.0,
+      -1.0, -1.0,  0.0
+    ];
+    this.vertices = new Float32Array( vertices );
+    // object knows how to draw itself.
+    this.mode = GL_TRIANGLE_STRIP;
+    this.draw = function( vertexBuffer ){
+        vertexBuffer.drawArrays( this.mode );
+    };
+  }
+  var square = new squareGeometry();
+  var squareMV = new mvMatrix();
+  var squareVertexBuffer = new gl.Buffer( square.vertices, 3, square.vertices.length / 3);
+
+
+  vec3.set(triangleMV.pos, -1.5, 0.0, -7.0);
+  vec3.subtract(squareMV.pos, triangleMV.pos, [3.0, 0.0, 0.0]);
+
+  function drawScene(){
+    shaderProgram.bind();
+    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // gl-matrix API is not the same as glMatrix-0.9.5
+    mat4.perspective( pMatrix, 45, gl.viewportWidth / gl.viewportHeight, nearFrustum, farFrustum );
+    shaderProgram.setUniform("uPMatrix", pMatrix );
+
+    shaderProgram.setUniform("uMVMatrix", triangleMV.update() );
+    shaderProgram.setBuffer("aVertexPosition", triangleVertexBuffer);
+    triangle.draw(triangleVertexBuffer);
+    shaderProgram.setUniform("uMVMatrix", squareMV.update() );
+    shaderProgram.setBuffer("aVertexPosition", squareVertexBuffer);
+    square.draw(squareVertexBuffer);
+  }
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.enable(gl.DEPTH_TEST);
+  drawScene();
+});
+</script>
