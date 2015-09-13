@@ -1,6 +1,6 @@
 # What is webGL
 
-Believe or not, webGL can draw only three kinds of 2D things in the area [(-1,-1),(1,1)].
+Believe it or not, webGL can draw only three kinds of 2D things in the area [(-1,-1),(1,1)].
 
 * POINT: point
 * LINE: line between 2 points
@@ -54,12 +54,12 @@ The shader must fill gl_Position, fixed name in webGL, which is 4 dimensional ve
 In this case, gl_Position is filled with vec4 that is mixture of aVertexPosition(vec3) and 1.0.
 
 ```
-\<script id="shader-vs" type="x-shader/x-vertex">
+<script id="shader-vs" type="x-shader/x-vertex">
 attribute vec3 aVertexPosition;
 void main(void) {
   gl_Position = vec4(aVertexPosition, 1.0);
 }
-\</script>
+</script>
 ```
 webGL processes each vertex by this vertex shader and get the result, gl_Position.
 
@@ -68,12 +68,12 @@ webGL processes each vertex by this vertex shader and get the result, gl_Positio
 Fragment shader 
 
 ```
-\<script id="shader-fs" type="x-shader/x-fragment">
+<script id="shader-fs" type="x-shader/x-fragment">
 precision mediump float;
 void main(void) {
   gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
-\</script>
+</script>
 ```
 
 ```javascript
