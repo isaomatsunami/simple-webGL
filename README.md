@@ -23,7 +23,7 @@ So, learning webGL means;
 * how to decompose objects into POINT/LINE/TRIANGLEs
 * how to order GPU to draw them
 
-## How to order
+## Shader program
 
 simpleWebGL01.html shows only one triangle in the middle of the canvas.
 
@@ -44,7 +44,7 @@ vertex shader is a job instruction about vertex(point), fragment shader is about
   var shaderProgram = new gl.GlslProg("shader-vs", "shader-fs");
 ```
 
-2 shaders are written in GLSL(OpenGL Shanding Language).
+2 shaders are written in GLSL(OpenGL Shading Language).
 
 Vertex shader defines attribute variables, which receive data from javascript.
 The shader must fill gl_Position, fixed name in webGL, which is 4 dimensional vector.
@@ -61,11 +61,12 @@ void main(void) {
 }
 </script>
 ```
-webGL processes each vertex by this vertex shader and get the result, gl_Position.
 
+When webGL is ordered to draw POINT/LINE/TRIANGLEs, At first, it processes every vertex by using this vertex shader and get the result, gl_Position. Next, it calculates which pixels need to be painted; In case of LINE, for example, pixels which lies between 2 gl_Positions are picked up.
 
+For each pixel, webGL calls the fragment shader. it must fill gl_FragColor, fixed name, which is vec4 (r, g, b, alpha). r/g/b/alpha is value in [0,1].
 
-Fragment shader 
+In this case, gl_FragColor is (1,1,1,1), perfect white.
 
 ```
 <script id="shader-fs" type="x-shader/x-fragment">
@@ -76,25 +77,29 @@ void main(void) {
 </script>
 ```
 
+When webGL gets gl_FragColor, (if gl.DEPTH_TEST is enabled) it compares the z-value of the pixel it is going to paint (new pixel) and the z-value of the pixel in GPU memory (old pixel). If the new pixel is judged to lie between the origin (viewpoint) and the old pixel, webGL paints the new pixel and update its z-value.
+
+As you see, shaders are general rule of how to deal with vertex/pixel in program's clothing. This pair of shaders defines how they look, shiny, shadowy, metallic, cartoon-like or whatever you want. You can make as many shader pairs as you need.
+
+## Draw call 
+
+
 ```javascript
   // vertices is series of triplets(x,y,z)
-  var vertices = new Float32Array( [0.0,0.0,0.0,  0.5,0.0,0.0,  0.0,0.5,0.0] );
+  var vertices = new Float32Array( [-0.5,-0.5,0.0,  0.5,-0.5,0.0,  0.0,0.5,0.0] );
   // reserve memory in GPU for vertices, telling these are triplets by first 3, number of triplets by second 3.
   var triangleVertexBuffer = new gl.Buffer( vertices, 3, 3);
 
-  function drawScene(){
-    shaderProgram.bind(); // tell GPU to follow this job order
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // refresh your brain
-
-    // send triangleVertexBuffer to GPU
-    shaderProgram.setBuffer("aVertexPosition", triangleVertexBuffer);
-    // order to draw it
-    triangleVertexBuffer.drawArrays( GL_TRIANGLES );
-  }
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // draw the canvas in black
   gl.enable(gl.DEPTH_TEST); // tell GPU to check z-value
-  drawScene();
+    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // refresh your brain
+
+  shaderProgram.bind(); // tell GPU to follow this job order
+  // send triangleVertexBuffer to GPU
+  shaderProgram.setBuffer("aVertexPosition", triangleVertexBuffer);
+  // order to draw it
+  triangleVertexBuffer.drawArrays( GL_TRIANGLES );
 ```
 
 

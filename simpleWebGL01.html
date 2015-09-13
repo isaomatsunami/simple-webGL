@@ -21,7 +21,7 @@ void main(void) {
 </script>
 <script>
 window.onload = function(){
-  var width = 1000, height = 500, nearFrustum = 0.1, farFrustum = 100;  
+  var width = 500, height = 500, nearFrustum = 0.1, farFrustum = 100;  
   // intialise webGL
   var gl = gl_Context( document.getElementById("chart"), width, height);
   if( gl.failed ) {
@@ -33,22 +33,19 @@ window.onload = function(){
   var shaderProgram = new gl.GlslProg("shader-vs", "shader-fs");
 
   // vertices is series of triplets(x,y,z)
-  var vertices = new Float32Array( [0.0,0.0,0.0,  0.5,0.0,0.0,  0.0,0.5,0.0] );
+  var vertices = new Float32Array( [-0.5,-0.5,0.0,  0.5,-0.5,0.0,  0.0,0.5,0.0] );
   // reserve memory in GPU for vertices, telling these are triplets by first 3, number of triplets by second 3.
   var triangleVertexBuffer = new gl.Buffer( vertices, 3, 3);
 
-  function drawScene(){
-    shaderProgram.bind(); // tell GPU to follow this job order
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // refresh your brain
-
-    // send triangleVertexBuffer to GPU
-    shaderProgram.setBuffer("aVertexPosition", triangleVertexBuffer);
-    // order to draw it
-    triangleVertexBuffer.drawArrays( GL_TRIANGLES );
-  }
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // draw the canvas in black
   gl.enable(gl.DEPTH_TEST); // tell GPU to check z-value
-  drawScene();
+    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // refresh your brain
+
+  shaderProgram.bind(); // tell GPU to follow this job order
+  // send triangleVertexBuffer to GPU
+  shaderProgram.setBuffer("aVertexPosition", triangleVertexBuffer);
+  // order to draw it
+  triangleVertexBuffer.drawArrays( GL_TRIANGLES );
 };
 </script>
