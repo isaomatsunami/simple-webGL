@@ -9,16 +9,15 @@ Believe it or not, webGL can draw only three kinds of 2D things in the area [(-1
 So it is far less powerful than CANVAS or SVG, by which you can draw rectangles or circles directly.
 
 But webGL does one thing.
-When it draws a pixel, it keeps in memory additional value, z-value, which usually is used to record the distance from the viewpoint.
-During drawing process, webGL checks the z-value at the pixel where it trys to draw.
+When it draws a pixel, it keeps in memory additional value, z-value, which is usually used to record the distance from the viewpoint.
+During drawing process, webGL checks the z-value at the pixel where it tries to draw.
 If the z-value means the pixel drawn before is farther than the pixel wenGL is trying to draw, it overwrites the pixel safely.
 If not, webGL will skip drawing a pixel because the pixel is positioned behind the pixel previously drawn there.
-(This is quite different from HTML, which are basically drawn in order of document)
-This z-value check, called DEPTH_TEST, is optional. you can turn on/off as you like.
+(This is quite different from HTML, which are basically drawn in order of document. This z-value check, called DEPTH_TEST, is optional. you can turn on/off as you like)
 
-Moreover, webGL is designed to use GPU, a graphic processor that lies between CPU and a display. The CPU does not draw POINT/LINE/TRIANGLEs by itself but orders GPU to do it in his place and stead. Current GPUs can draw well over billions of  triangles in a second. Gorgeous graphics in XBox/PlayStation are made by this technology.
+Moreover, webGL is designed to use GPU, a graphic processor that lies between CPU and a display. The CPU does not draw POINT/LINE/TRIANGLEs by itself but orders GPU to do it in his place and stead. Current GPUs can draw well over billions of triangles in a second. Gorgeous graphics in XBox/PlayStation are made possible by this technology.
 
-So, learning webGL means understanding below;
+So, learning webGL means learning 2 things;
 
 * how to order GPU to draw them
 * how to decompose objects into POINT/LINE/TRIANGLEs
@@ -29,7 +28,7 @@ webGL drawing is composed of two parts. One is shader program, establishing gene
 
 simpleWebGL01.html is the simplest webGL sample. It shows only one triangle in the middle of the canvas.
 
-After initialization( gl_Context() is my personal wrapper function in webgl.js. it checks the browser supports webGL or not, creates a canvas on which webGL draws and returns WebGLRenderingContext), a shaderProgram is created by calling new gl.GlslProg("shader-vs", "shader-fs"). This gl.GlslProg() takes 2 parameters. The first param points to "vertex shader", second to "fragment shader".
+After initialization( gl_Context() is my personal wrapper function in webgl.js. it checks whether the browser supports webGL or not, creates a canvas on which webGL draws and returns WebGLRenderingContext object), a shaderProgram is created by calling new gl.GlslProg("shader-vs", "shader-fs"). This gl.GlslProg(), my personal function, takes 2 parameters. The first param points to "vertex shader", second to "fragment shader".
 Vertex shader is a job instruction about vertex(point), fragment shader is about pixel. (So fragment shader is often called pixel shader)
 
 ```javascript
@@ -47,12 +46,12 @@ Vertex shader is a job instruction about vertex(point), fragment shader is about
 
 A shader is a program, as you see below, written in GLSL(OpenGL Shading Language).
 
-Vertex shader defines attribute variables, which receive data from javascript.
-The shader must fill gl_Position, fixed name in webGL, which is 4 dimensional vector.
+Vertex shader defines attribute variables, to which data is assigned from the main program.
+The shader must fill gl_Position, fixed name in webGL, which is a 4 dimensional vector.
 
 (Why is it 4 dimensional? Common 3D coordinate (x,y,z) is denoted as (x,y,z,1) in homogeneous coordinate. What is homogeneous coordinate? Don't ask me now.)
 
-In this case, gl_Position is filled with vec4 that is mixture of aVertexPosition(vec3) and 1.0.
+In this case, gl_Position is filled with a composition of aVertexPosition(vec3) and 1.0.
 
 ```
 <script id="shader-vs" type="x-shader/x-vertex">
