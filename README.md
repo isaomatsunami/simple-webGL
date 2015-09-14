@@ -117,7 +117,7 @@ As this triangleVertexBuffer has been created as 3 triplets, webGL assigns every
 
 simpleWebGL02.html draws a triangle in a more verbose way.
 
-Vertext shader defines 3 float variables instead of 1 vec3. 3 floats are bound into a gl_Position.
+This vertex shader defines 3 float variables instead of 1 vec3. 3 floats plus 1.0 are bound into gl_Position(vec4).
 
 ```
 <script id="shader-vs" type="x-shader/x-vertex">
@@ -158,46 +158,46 @@ Strangely enough, after setBuffer(), we can call xVertexBuffer.drawArrays(GL_TRI
 
 ## Errors
 
-Whai if you write wrongly?
+What if you write wrongly?
 
 1. Setting 3rd param incorrectly does not cause error.
 
-```javascript
+  ```javascript
   var vertices = new Float32Array( [-0.5,  0.5,  0.0] );
   var xVertexBuffer = new gl.Buffer( vertices, 1, 2[or 4]); // No error
-```
+  ```
 
 2. Breaking tandemness may affect or not, but does not cause error.
 
-```javascript
+  ```javascript
   var xVertexBuffer = new gl.Buffer( x_of_vertices, 1, 3);
   var yVertexBuffer = new gl.Buffer( y_of_vertices, 1, 2); <== wrong. draw a triangle
   var zVertexBuffer = new gl.Buffer( z_of_vertices, 1, 3);
-```
-but...
+  ```
+  but...
 
-```javascript
+  ```javascript
   var xVertexBuffer = new gl.Buffer( x_of_vertices, 1, 3);
   var yVertexBuffer = new gl.Buffer( y_of_vertices, 1, 3);
   var zVertexBuffer = new gl.Buffer( z_of_vertices, 1, 2); <== wrong. not draw a triangle
-```
-Almost unpredictable for me.
+  ```
+  Almost unpredictable for me.
 
 3. Insufficient data cause error *GL_INVALID_OPERATION : glDrawArrays: attempt to access out of range vertices in attribute*
 
-```javascript
+  ```javascript
   var x_of_vertices = new Float32Array( [-0.5,  0.5,  0.0] );
   var y_of_vertices = new Float32Array( [-0.5, -0.5,  0.5] );
   var z_of_vertices = new Float32Array( [-0.0,  0.0] ); <== this cause error at draw call
   var xVertexBuffer = new gl.Buffer( x_of_vertices, 1, 3);
   var yVertexBuffer = new gl.Buffer( y_of_vertices, 1, 3);
   var zVertexBuffer = new gl.Buffer( z_of_vertices, 1, 3);
-```
+  ```
 
 In webGL, you have to write at least 3 programs (2 shaders and main javascript).
 Sometimes it is nerve-wracking to find and fix bugs. It is advisable to test more frequently than usual.
 
-**** reference 
+#### reference 
 
 [WebGL 1.0 API Quick Reference](https://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf)
 
