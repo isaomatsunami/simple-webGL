@@ -39,7 +39,7 @@ window.onload = function(){
 
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // draw the canvas in black
   gl.enable(gl.DEPTH_TEST); // tell GPU to check z-value
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // refresh your brain
 
   shaderProgram.bind(); // tell GPU to follow this job order

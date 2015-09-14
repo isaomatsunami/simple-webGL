@@ -14,14 +14,16 @@ void main(void) {
 }
 </script>
 <script id="shader-vs" type="x-shader/x-vertex">
-attribute vec3 aVertexPosition;
+attribute float aX;
+attribute float aY;
+attribute float aZ;
 void main(void) {
-  gl_Position = vec4(aVertexPosition, 1.0);
+  gl_Position = vec4(aX, aY, aZ, 1.0);
 }
 </script>
 <script>
 window.onload = function(){
-  var width = 1000, height = 500, nearFrustum = 0.1, farFrustum = 100;  
+  var width = 500, height = 500, nearFrustum = 0.1, farFrustum = 100;  
   // intialise webGL
   var gl = gl_Context( document.getElementById("chart"), width, height);
   if( gl.failed ) {
@@ -32,23 +34,23 @@ window.onload = function(){
   // shaderProgram is a kind of job order
   var shaderProgram = new gl.GlslProg("shader-vs", "shader-fs");
 
-  // vertices is series of triplets(x,y,z)
-  var vertices = new Float32Array( [0.0,0.0, 0.0,0.5, 0.5,0.5,   0.5,0.5, 0.5,0.0, 0.0,0.0] );
-  // reserve memory in GPU for vertices, telling these are triplets by first 3, number of triplets by second 3.
-  var triangleVertexBuffer = new gl.Buffer( vertices, 2, 6);
+  var x_of_vertices = new Float32Array( [-0.5,  0.5,  0.0] );
+  var y_of_vertices = new Float32Array( [-0.5, -0.5,  0.5] );
+  var z_of_vertices = new Float32Array( [-0.0,  0.0,  0.0] );
+  var xVertexBuffer = new gl.Buffer( x_of_vertices, 1, 3);
+  var yVertexBuffer = new gl.Buffer( y_of_vertices, 1, 3);
+  var zVertexBuffer = new gl.Buffer( z_of_vertices, 1, 3);
 
-  function drawScene(){
-    shaderProgram.bind(); // tell GPU to follow this job order
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // refresh your brain
-
-    // send triangleVertexBuffer to GPU
-    shaderProgram.setBuffer("aVertexPosition", triangleVertexBuffer);
-    // order to draw it
-    triangleVertexBuffer.drawArrays( GL_TRIANGLES );
-  }
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // draw the canvas in black
   gl.enable(gl.DEPTH_TEST); // tell GPU to check z-value
-  drawScene();
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); // size of canvas
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // refresh your brain
+
+  shaderProgram.bind();
+  shaderProgram.setBuffer("aX", xVertexBuffer);
+  shaderProgram.setBuffer("aY", yVertexBuffer);
+  shaderProgram.setBuffer("aZ", zVertexBuffer);
+
+  zVertexBuffer.drawArrays( GL_TRIANGLES );
 };
 </script>
